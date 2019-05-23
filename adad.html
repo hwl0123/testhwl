@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>不止于经典</title>
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" name="description" content="">
+
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <style type="text/css">
+        body     { padding-top:30px; }
+    </style>
+</head>
+<body >
+<div ng-app="myApp" ng-controller="myctrl">
+    {{test}}
+</div>
+<script>
+    //自己写了一个把字符串转换成json格式对象的方法
+    var $ = {};
+    $.serialize = function(data){
+        var arr1 = data.split('&');
+        var jsonObj = {};
+        for(var i=0; i<arr1.length; i++) {
+            var arr2 = arr1[i].split('=');
+            jsonObj[arr2[0]] = arr2[1];
+        }
+        return jsonObj;
+    };
+
+    var jsonData = {name:"foo"};
+    var httpGet = angular.module("myApp",[]);
+    httpGet.config(function($httpProvider){
+//        console.log($httpProvider.defaults.headers)
+        //删除后请求头里不再有 X-Requested-With 属性
+//        delete $httpProvider.defaults.headers.common['X-Requested-With'];
+//        //为请求头添加Authorization属性为'code_bunny'
+//        $httpProvider.defaults.headers.common['Authorization'] = 'code_bunny';
+    });
+    httpGet.factory('getData',function($http,$q){
+        return function(){
+            var defer = $q.defer();
+            $http({
+                method:'post',
+                url:'http://huweiliang.com/demo39/Huer/User/showtable',
+//                params:{key1:'value1',key2:'value2'},  //请求带有的参数,//转换成url?key1=value1&key2=value2
+                data:jsonData,  //post请求所提交的数据
+//                headers: {'Content-Type':'application/json;charset=UTF-8'},  //请求头里会添加Authorization属性为'code_bunny'
+                transformResponse:function(data){
+                    //通过$.serialize方法转换后,得到json格式的对象,然后获取name属性的值
+                    return $.serialize(data)['name']
+                },
+                timeout: 1000      // 超时返回error信息
+            }).success(function(data,status,headers,config){
+                defer.resolve(data);
+            }).error(function(data,status,headers,config){
+                defer.reject(data)
+            });
+            return defer.promise
+        }
+    });
+    httpGet.controller('myctrl',function($scope,getData){
+        getData().then(function(success){
+            console.log(success);
+            $scope.data = success;
+        },function(error){
+            console.log(error);
+            $scope.data = error;
+        });
+
+    });
+
+</script>
+
+<script type="text/javascript">
+    /**
+     *
+
+    var myAppModule = angular.module("myApp",[]);
+
+    myAppModule.factory("getData",function($http,$q){
+
+        return function(){
+            var defer = $q.defer();
+            $http.post('js/gethint.json',{userID:"123"}).success(function(data,status,headers,congfig){
+                console.log(data);
+                defer.resolve(data);
+            }).error(function(data,status,headers,congfig){
+                defer.reject(data);
+            });
+
+            return defer.promise
+        }
+
+    });
+    myAppModule.controller("myctrl",function($scope,getData){
+
+        getData().then(function(greeting) {
+            console.log('Success: ' + greeting.say);
+        }, function(reason) {
+            console.log('Failed: ' + reason);
+        }, function(update) {
+            console.log('Got notification: ' + update);
+        });
+    })
+     */
+</script>
+
+
+<script>
+    /**
+     *
+
+    var validationApp = angular.module('validationApp', []);
+
+    function okToGreet(name){
+        return name === 'Robin Hood';
+    }
+    validationApp.controller('mainController',function($scope,$http,$q,name){
+        console.log(0);
+        function asyncGreet(name) {
+            var deferred = $q.defer();
+
+            setTimeout(function() {
+                // 因为这个异步函数fn在未来的异步执行，我们把代码包装到 $apply 调用中，一边正确的观察到 model 的改变
+                $scope.$apply(function() {
+                    deferred.notify('About to greet ' + name + '.');
+
+                    if (okToGreet(name)) {
+                        deferred.resolve('Hello, ' + name + '!');
+                    } else {
+                        deferred.reject('Greeting ' + name + ' is not allowed.');
+                    }
+                });
+            }, 1000);
+
+            return deferred.promise;
+        }
+
+        var promise = asyncGreet('Robin Hood');
+
+        promise.then(function(greeting) {
+            alert('Success: ' + greeting);
+        }, function(reason) {
+            alert('Failed: ' + reason);
+        }, function(update) {
+            alert('Got notification: ' + update);
+        });
+    });
+
+     */
+
+
+
+
+</script>
+</body>
+</html>
