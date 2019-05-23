@@ -22,3 +22,7 @@ $ webpack -w
 ### `npm install`
 
 ### `npm start`
+
+## NEJ
+
+直接进入NEJ文件夹, 并开启一个静态服务器(加载html资源是使用的ajax), 建议使用[puer](https://github.com/leeluolee/puer)
